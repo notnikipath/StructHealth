@@ -1,4 +1,4 @@
-# Task 28 - StructHealth
+# StructHealth
 
 StructHealth is a microservice platform for structural health monitoring of bridges, high-rise buildings, dams, tunnels, and industrial chimneys.
 
@@ -36,7 +36,7 @@ StructHealth is a microservice platform for structural health monitoring of brid
 ## Run
 
 ```bash
-cd d:\Шарага\Кинжа12\Task_28_StructHealth
+cd 'your/project/folder'
 docker compose up --build -d
 ```
 
