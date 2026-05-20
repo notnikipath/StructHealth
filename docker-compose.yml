@@ -1,0 +1,174 @@
+﻿services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: structhealth-api-gateway
+    env_file: .env
+    ports:
+      - "32071:8500"
+    depends_on:
+      - asset-service
+      - ingestion-service
+      - analysis-service
+      - alert-service
+      - report-service
+      - notification-service
+    networks: [structhealth-net]
+
+  asset-service:
+    build:
+      context: .
+      dockerfile: asset-service/Dockerfile
+    container_name: structhealth-asset
+    env_file: .env
+    ports:
+      - "32072:8501"
+    depends_on:
+      - postgres
+      - redis
+    networks: [structhealth-net]
+
+  ingestion-service:
+    build:
+      context: .
+      dockerfile: ingestion-service/Dockerfile
+    container_name: structhealth-ingestion
+    env_file: .env
+    ports:
+      - "32073:8502"
+    depends_on:
+      - timescaledb
+      - redis
+      - redpanda
+    networks: [structhealth-net]
+
+  analysis-service:
+    build:
+      context: .
+      dockerfile: analysis-service/Dockerfile
+    container_name: structhealth-analysis
+    env_file: .env
+    ports:
+      - "32074:8503"
+    depends_on:
+      - timescaledb
+      - redis
+      - redpanda
+    networks: [structhealth-net]
+
+  alert-service:
+    build:
+      context: .
+      dockerfile: alert-service/Dockerfile
+    container_name: structhealth-alert
+    env_file: .env
+    ports:
+      - "32075:8504"
+    depends_on:
+      - redis
+      - redpanda
+    networks: [structhealth-net]
+
+  report-service:
+    build:
+      context: .
+      dockerfile: report-service/Dockerfile
+    container_name: structhealth-report
+    env_file: .env
+    ports:
+      - "32076:8505"
+    depends_on:
+      - postgres
+      - timescaledb
+      - redis
+    networks: [structhealth-net]
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: structhealth-notification
+    env_file: .env
+    ports:
+      - "32077:8506"
+    depends_on:
+      - redis
+    networks: [structhealth-net]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: structhealth-frontend
+    env_file: .env
+    ports:
+      - "32078:5178"
+    depends_on:
+      - api-gateway
+    networks: [structhealth-net]
+
+  postgres:
+    image: postgres:16
+    container_name: structhealth-postgres
+    environment:
+      POSTGRES_DB: structhealth
+      POSTGRES_USER: structhealth
+      POSTGRES_PASSWORD: structhealth
+    ports:
+      - "32079:5432"
+    volumes:
+      - structhealth_postgres_data:/var/lib/postgresql/data
+    networks: [structhealth-net]
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: structhealth-timescaledb
+    environment:
+      POSTGRES_DB: structhealth
+      POSTGRES_USER: structhealth
+      POSTGRES_PASSWORD: structhealth
+    ports:
+      - "32080:5432"
+    volumes:
+      - structhealth_timescaledb_data:/var/lib/postgresql/data
+    networks: [structhealth-net]
+
+  redis:
+    image: redis:7
+    container_name: structhealth-redis
+    ports:
+      - "32081:6379"
+    networks: [structhealth-net]
+
+  redpanda:
+    image: redpandadata/redpanda:v24.3.5
+    container_name: structhealth-redpanda
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp
+      - "1"
+      - --memory
+      - "512M"
+      - --reserve-memory
+      - "0M"
+      - --node-id
+      - "0"
+      - --check=false
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://redpanda:9092
+    ports:
+      - "19192:9092"
+    networks: [structhealth-net]
+
+networks:
+  structhealth-net:
+    driver: bridge
+
+volumes:
+  structhealth_postgres_data:
+  structhealth_timescaledb_data:
