@@ -36,7 +36,7 @@ StructHealth is a microservice platform for structural health monitoring of brid
 ## Run
 
 ```bash
-cd 'your/project/folder'
+cd StructHealth
 docker compose up --build -d
 ```
 

@@ -88,7 +88,7 @@ export function DashboardPage() {
 
   const headerStatus = useMemo(() => {
     if (status === "loading") return "loading";
-    if (status === "failed") return "fallback";
+    if (status === "failed") return "Service unavailable";
     return "live";
   }, [status]);
 
@@ -97,7 +97,7 @@ export function DashboardPage() {
       <header className="hero">
         <div className="hero-copy">
           <p className="eyebrow">StructHealth Monitoring</p>
-          <h1>Bridge and building health in one operational window.</h1>
+          <h1>Infrastructure health</h1>
           <p>
             Real-time ingestion, FFT-based analysis, threshold breach detection, fatigue prediction, alerting, and daily
             expert reports.
@@ -113,8 +113,8 @@ export function DashboardPage() {
             Asset ID
             <input value={assetId} onChange={(event) => setAssetId(event.target.value)} placeholder="AST-BRIDGE-001" />
           </label>
-          <button onClick={refresh}>Refresh Dashboard</button>
-          <p className="status-line">Status: {headerStatus}</p>
+          <button onClick={refresh} disabled={status === "loading"}>Refresh Dashboard</button>
+          <p className="status-line" role="status" aria-live="polite">Status: {headerStatus}</p>
         </div>
       </header>
 
