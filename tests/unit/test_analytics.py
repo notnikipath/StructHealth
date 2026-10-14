@@ -15,6 +15,13 @@ def test_lowpass_filter_returns_values() -> None:
     assert len(filtered) == len(values)
 
 
+def test_lowpass_filter_preserves_a_short_constant_signal() -> None:
+    values = [0.25] * 7
+    filtered = lowpass_filter(values, cutoff_hz=10, sampling_hz=100)
+    assert len(filtered) == len(values)
+    assert all(abs(value - 0.25) < 1e-8 for value in filtered)
+
+
 def test_anomaly_score_and_frequency() -> None:
     normal_signal = [0.2, 0.22, 0.21, 0.2, 0.23, 0.24]
     disturbed_signal = [0.2, 0.22, 0.21, 0.8, 1.0, 0.9]

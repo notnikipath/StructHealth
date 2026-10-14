@@ -28,7 +28,8 @@ def lowpass_filter(values: list[float], cutoff_hz: float, sampling_hz: float, or
         nyquist = sampling_hz / 2.0
         normalized = min(max(cutoff_hz / max(nyquist, 1e-6), 0.001), 0.99)
         b, a = butter(order, normalized, btype="low", analog=False)
-        return filtfilt(b, a, np.asarray(values, dtype=float)).tolist()
+        padlen = min(3 * max(len(a), len(b)), len(values) - 2)
+        return filtfilt(b, a, np.asarray(values, dtype=float), padlen=padlen).tolist()
     window = min(max(int(sampling_hz // max(cutoff_hz, 1)), 2), 12)
     filtered: list[float] = []
     for index in range(len(values)):
